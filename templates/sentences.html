@@ -3,6 +3,7 @@
 {% include 'nav.html' %}
 <h1>Sentences</h1>
 <div>
+  {% if sentences %}
   <table>
     <thead>
       <th>Sentence</th>
@@ -17,5 +18,6 @@
       {% endfor %}
     </tbody>
   </table>
+  {% endif %}
 </div>
 {% endblock %}
