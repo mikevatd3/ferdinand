@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ferdinand</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <script src="https://unpkg.com/htmx.org@1.9.10" 
+    integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" 
+    crossorigin="anonymous"></script>
+  <style>
+    .phrase-check {
+      display: none;
+    }
+
+    .phrase-word {
+      font-size: xx-large;
+      font-weight: bold;
+    }
+
+    .phrase-word:hover {
+      color: teal;
+    }
+
+    input:checked + label {
+      color: lightcoral;
+    }
+
+    .sentence_text {
+      margin-bottom: 2em;
+    }
+
+    .help_text {
+      font-size: larger;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    {% block content %}{% endblock %}
+</body>
+
+</html>

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+  <nav>
+    <ul>
+      <h1>Ferdinand</h1>
+    </ul>
+    <ul></ul>
+    <ul><i>{{ current_project }}</i></ul>
+  </nav>
+  <form action="/sentences?analyze=yes" method="post">
+    <input type="text" name="sentence" placeholder="Enter some text to begin analysis" />
+  </form>
+  <p><a href="/sentences">sentences</a></p> <p><a href="/definables">phrases</a></p>
+  <p><a href="/help">how to use this tool</a></p>
+{% endblock %}

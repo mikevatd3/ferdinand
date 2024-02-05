@@ -1,0 +1,13 @@
+<tr>
+  <th>{{ phrase.words }}</th>
+  {% if phrase.definition %}
+  <td><i>{{ phrase.definition }}</i></td>
+  {% else %}
+  <td><i>Not yet defined</i></td>
+  {% endif %}
+  <td><a 
+      hx-get="/definables/{{ phrase.id }}?inline_edit=yes"
+      hx-target="closest tr"
+      hx-swap="outerHTML">edit</a> <a hx-delete="/definables/{{ phrase.id }}" hx-target="closest tr">delete</a>
+  </td>
+</tr>

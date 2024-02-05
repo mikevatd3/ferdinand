@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+  {% include 'nav.html' %}
+  <div id="sentence_banner">
+    <form hx-on::after-request="this.reset()">
+      <div class="sentence_text">
+        {% for word in sentence[1].split() %}
+        <!-- Make checkbox hidden, size it to word box size, or use js to check it -->
+        <!-- Always be analyzing -->
+          <input type="hidden" name="sentence" value="{{ sentence[0] }}" />
+          <input type="checkbox" class="phrase-check" id="{{ loop.index }}@@{{ word }}" name="{{ loop.index }}@@{{ word }}" />
+          <label class="phrase-word" for="{{ loop.index }}@@{{ word }}">{{ word }}</label>
+        {% endfor %}
+      </div>
+      <button hx-post="/definables"
+              hx-trigger="click, keydown[keyCode==13]"
+              hx-include="#sentence_banner"
+              hx-target="#phrase_table"
+              hx-select="#phrase_table"
+        >Save selected phrase</button>
+    </form>
+  </div>
+  {% include 'phrase_table.html' %}
+{% endblock %}

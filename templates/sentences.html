@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'nav.html' %}
+<h1>Sentences</h1>
+<div>
+  <table>
+    <thead>
+      <th>Sentence</th>
+      <th></th>
+    </thead>
+    <tbody>
+      {% for sentence in sentences %}
+        <tr>
+          <td>{{ sentence.words }}</td> 
+          <td><a href="/sentences/{{ sentence[0] }}">analyze</a></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

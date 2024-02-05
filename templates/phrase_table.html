@@ -1,0 +1,17 @@
+<div id="phrase_table">
+{% if phrases %}
+<table>
+  <thead>
+    <tr>
+      <th>Phrase</th>
+      <th>Definition</th>
+      <th></th>
+    </tr>
+    <tbody>
+    {% for phrase in phrases %}
+      {% include 'phrase_inline.html' %}
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+</div>

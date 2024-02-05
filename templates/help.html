@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'nav.html' %}
+<h1>Ferdinand help</h1>
+<p class="help_text">
+  Ferdinand is a tool to manage definitions for analysis projects.
+</p>
+<h2>How to use this tool</h2>
+<p class="help_text">
+  Ferdinand has two concepts, sentences and phrases. A sentence is made up of 
+  phrases and each phrase is defined by a sentence. The tool provides simple
+  but useful ways to manage and edit both.
+</p>
+<h3>Sentence analysis mode</h3>
+<p class="help_text">
+  Enter a statement or question from your analysis project into the box on 
+  the first page to begin. This takes you into 'sentence analysis' mode. As 
+  you review your sentence, there are likely phrases that are clear enough 
+  in plain language but will need further explaination or specificity as 
+  the analysis continues. 
+</p>
+<p class="help_text">
+  Find one of these phrases in the sentence. Highlight each word from that 
+  phrase by clicking it. Selected words will appear in orange. Once all the 
+  words from the phrase are selected, click the big blue botton to add the
+  phrase to the phrase list. It can now be definied.
+</p>
+<h3>Defining phrases</h3>
+<p class="help_text">
+  Phrases can be defined on either the sentence analysis page in the phrase
+  table at the bottom of the page, or on the phrases page that list all 
+  current phrases. Simply enter the phrase into the text block that appears
+  when you click the edit link.
+</p>
+<p class="help_text">
+  The definition that you provide for a phrase should be kept as simple as possible. 
+  The core trick to Ferdinand is that <i>definitions are also sentences.</i> This means
+  that if there are phrases that are unclear in the next sentence down, you can add them
+  to the list and define them with more sentences, and so on ...
+</p>
+<h3>Next steps</h3>
+<p class="help_text">
+  This is an absolute bare-bones application in the earliest stages of development. The
+  following is a list of potential additional features. It's worth reviewing to see if a
+  behavior you may be expecting is not available yet.
+</p>
+<ul>
+  <li>Status of the definition of a phrase using the explore-accept framework</li>
+  <li>Editable sentences</li>
+  <li>'STALE' phrases—when a phrase is edited out of its originating sentence</li>
+  <li>Notes and documentation page for phrases</li>
+  <li>On-site projects (currently managed by cli tool)</li>
+  <li>User collaboration, comments, consent processes</li>
+</ul>
+{% endblock %}

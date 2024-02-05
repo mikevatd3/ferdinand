@@ -1,0 +1,15 @@
+<tr>
+  <th>{{ phrase.words }}</th>
+  <td>
+    <input type="hidden" name="phrase_id" value="{{ phrase.id }}">
+    {% if not phrase.definition %}
+    <input type="text" name="definition" placeholder="enter a new definition" />
+    {% else %}
+    <input type="text" name="definition" value="{{ phrase.definition }}" />
+    {% endif %}
+  </td>
+  <td><a hx-post="/definitions"
+         hx-target="closest tr"
+         hx-include="closest tr"
+         hx-swap="outerHTML">save</a>   <a hx-delete="/definables/{{ phrase.id }}" hx-target="closest tr">delete</a></td>
+</tr>
