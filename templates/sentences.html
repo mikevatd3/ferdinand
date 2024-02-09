@@ -6,14 +6,19 @@
   {% if sentences %}
   <table>
     <thead>
-      <th>Sentence</th>
-      <th></th>
+      <tr>
+        <th>Sentence</th>
+        <th></th>
+      </tr>
     </thead>
     <tbody>
       {% for sentence in sentences %}
         <tr>
           <td>{{ sentence.words }}</td> 
-          <td><a href="/sentences/{{ sentence[0] }}">analyze</a></td>
+          <td><a href="/sentences/{{ sentence.id }}">analyze</a> <a 
+              hx-delete="/sentences/{{ sentence.id }}"
+              hx-target="closest tr"
+              >delete</a></td>
         </tr>
       {% endfor %}
     </tbody>

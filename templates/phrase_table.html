@@ -5,13 +5,15 @@
     <tr>
       <th>Phrase</th>
       <th>Definition</th>
+      <th>Status</th>
       <th></th>
     </tr>
-    <tbody>
+  </thead>
+  <tbody>
     {% for phrase in phrases %}
       {% include 'phrase_inline.html' %}
     {% endfor %}
-    </tbody>
+  </tbody>
 </table>
 {% endif %}
 </div>
