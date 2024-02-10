@@ -10,6 +10,47 @@
     integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" 
     crossorigin="anonymous"></script>
   <style>
+    .status_new {
+      color: deepskyblue;
+    } 
+
+    .status_exploring {
+      color: gold;
+    } 
+
+    .status_accepted {
+      color: chartreuse;
+    }
+
+    .status_stuck {
+      color: coral;
+    }
+
+    .base_nav {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-start;
+      align-items: center;
+      background-color: #101020;
+      padding-left: 1rem;
+    }
+    .base_nav * {
+      padding: 0.7rem;
+      font-size: x-large;
+    }
+    .base_nav .nav_selected {
+      border-bottom-style: solid;
+      border-bottom: 0.2rem solid deepskyblue;
+      border-radius: 0;
+      padding-top: 0.5rem;
+      padding-bottom: 0.3rem;
+      font-weight: bold;
+    }
+    .base_nav .home {
+      color: white;
+      font-weight: bold;
+      font-size: xx-large;
+    }
     .phrase-check {
       display: none;
     }
@@ -20,7 +61,7 @@
     }
 
     .phrase-word:hover {
-      color: teal;
+      color: deepskyblue;
     }
 
     input:checked + label {
@@ -34,12 +75,55 @@
     .help_text {
       font-size: larger;
     }
+
+    .one_line_input {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+    }    
+
+    .one_line_input input {
+      flex-grow: 3;
+    }
+
+    .one_line_input button {
+      width: min-content;
+    }
+
+    .sentence_edit_controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .sentence_edit_controls button {
+      width: max-content;
+    }
+
+    .sentence_edit_controls a {
+      margin-bottom: 1rem;
+    }
+
+    .sentence_text input[type="text-area"] {
+      font-size: xx-large;
+      font-weight: bold;
+    }
+
+    .stale_def {
+      color: gray;
+      background-color: gainsboro;
+      font-style: italic;
+    }
+
   </style>
 </head>
 
 <body>
-  <main class="container">
+  {% block nav %}{% endblock %}
+  <main id="all_content" class="container">
     {% block content %}{% endblock %}
+  </main>
 </body>
 
 </html>

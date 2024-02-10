@@ -1,8 +1,19 @@
 {% extends 'base.html' %}
+{% block nav %}
+{% with sentences=True,  phrases=False%}
+  {% include 'nav.html' %}
+{% endwith %}
+{% endblock %}
 {% block content %}
-{% include 'nav.html' %}
-<h1>Sentences</h1>
-<div>
+<div id="sentence_table">
+  <form class="one_line_input" hx-on::after-request="this.reset()">
+    <input type="text" name="words" placeholder="Enter a new sentence to analyze" />
+    <button
+      hx-post="/sentences"
+      hx-include"closest div"
+      hx-target="#sentence_table"
+      hx-select="#sentence_table">save</button>
+  </form>
   {% if sentences %}
   <table>
     <thead>
@@ -15,7 +26,7 @@
       {% for sentence in sentences %}
         <tr>
           <td>{{ sentence.words }}</td> 
-          <td><a href="/sentences/{{ sentence.id }}">analyze</a> <a 
+          <td><a href="/sentences/{{ sentence.id }}">analyze</a> | <a 
               hx-delete="/sentences/{{ sentence.id }}"
               hx-target="closest tr"
               >delete</a></td>

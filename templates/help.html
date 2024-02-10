@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
+{% block nav %}
+  {% include 'nav.html' %}
+{% endblock %}
 {% block content %}
-{% include 'nav.html' %}
 <h1>Ferdinand help</h1>
 <p class="help_text">
   Ferdinand is a tool to manage definitions for analysis projects.
@@ -45,7 +47,6 @@
   behavior you may be expecting is not available yet.
 </p>
 <ul>
-  <li>Status of the definition of a phrase using the explore-accept framework</li>
   <li>Editable sentences</li>
   <li>'STALE' phrases—when a phrase is edited out of its originating sentence</li>
   <li>Notes and documentation page for phrases</li>

@@ -1,23 +1,31 @@
 {% extends 'base.html' %}
+{% block nav %}
+  {% with phrases=False, sentences=True%}
+    {% include 'nav.html' %}
+  {% endwith %}
+{% endblock %}
 {% block content %}
-  {% include 'nav.html' %}
   <div id="sentence_banner">
     <form hx-on::after-request="this.reset()">
       <div class="sentence_text">
         {% for word in sentence.words.split() %}
-        <!-- Make checkbox hidden, size it to word box size, or use js to check it -->
         <!-- Always be analyzing -->
           <input type="hidden" name="sentence" value="{{ sentence.id }}" />
           <input type="checkbox" class="phrase-check" id="{{ loop.index }}@@{{ word }}" name="{{ loop.index }}@@{{ word }}" />
           <label class="phrase-word" for="{{ loop.index }}@@{{ word }}">{{ word }}</label>
         {% endfor %}
       </div>
-      <button hx-post="/phrases"
-              hx-trigger="click, keydown[keyCode==13]"
-              hx-include="#sentence_banner"
-              hx-target="#phrase_table"
-              hx-select="#phrase_table"
-        >Save selected phrase</button>
+      <div class="sentence_edit_controls">
+        <button hx-post="/phrases/analysis"
+                hx-trigger="click, keydown[keyCode==13]"
+                hx-include="#sentence_banner"
+                hx-target="#phrase_table"
+                hx-select="#phrase_table"
+          >Save phrase</button>
+        <a hx-get="/sentences/{{ sentence.id }}?edit=True"
+           hx-target="#sentence_banner"
+          >edit sentence</a>
+      </div>
     </form>
   </div>
   {% include 'phrase_table.html' %}

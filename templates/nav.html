@@ -1,13 +1,5 @@
-<nav>
-  <ul hx-boost="true">
-    <li><a href="/sentences">sentences</a></li>
-    <li><a href="/phrases">phrases</a></li>
-  </ul>
-  <ul></ul>
-  <ul></ul>
-  <ul>
-    <li hx-boost="true">
-      <h2><a href="/">Ferdinand</a></h2>
-    </li>
-  </ul>
+<nav class="base_nav">
+    <a class="home" href="/" hx-boost="true">Ferdinand</a>
+    <a {% if sentences %}class="nav_selected"{% endif %} href="/sentences" hx-boost="true">sentences</a>
+    <a {% if phrases %}class="nav_selected"{% endif %} href="/phrases" hx-boost="true">phrases</a>
 </nav>

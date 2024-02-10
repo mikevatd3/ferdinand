@@ -11,14 +11,14 @@
   </td>
   <td>
     <select name="status">
-      <option value="NEW" {% if phrase.definition_status == 'NEW' %}selected{% endif %}>NEW</option>
-      <option value="EXPLORING" {% if phrase.definition_status == 'EXPLORING' %}selected{% endif %}>EXPLORING</option>
-      <option value="ACCEPTED" {% if phrase.definition_status == 'ACCEPTED' %}selected{% endif %}>ACCEPTED</option>
-      <option value="STUCK" {% if phrase.definition_status == 'STUCK' %}selected{% endif %}>STALE</option>
+      <option class="status_new" value="NEW" {% if phrase.definition_status == 'NEW' %}selected{% endif %}>NEW</option>
+      <option class="status_exploring" value="EXPLORING" {% if phrase.definition_status == 'EXPLORING' %}selected{% endif %}>EXPLORING</option>
+      <option class="status_accepted" value="ACCEPTED" {% if phrase.definition_status == 'ACCEPTED' %}selected{% endif %}>ACCEPTED</option>
+      <option class="status_stuck" value="STUCK" {% if phrase.definition_status == 'STUCK' %}selected{% endif %}>STUCK</option>
     </select>
   </td>
-  <td><a hx-post="/definitions"
+  <td><button hx-post="/definitions"
          hx-target="closest tr"
          hx-include="closest tr"
-         hx-swap="outerHTML">save</a>   <a hx-delete="/phrases/{{ phrase.id }}" hx-target="closest tr">delete</a></td>
+         hx-swap="outerHTML">save</button></td>
 </tr>

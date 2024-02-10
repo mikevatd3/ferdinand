@@ -1,6 +1,17 @@
 {% extends 'base.html' %}
+{% block nav %}
+{% with sentences=False,  phrases=True%}
+  {% include 'nav.html' %}
+{% endwith %}
+{% endblock %}
 {% block content %}
-{% include 'nav.html' %}
-<h1>Phrases</h1>
+  <form class="one_line_input" hx-on::after-request="this.reset()">
+    <input type="text" name="words" placeholder="Enter a new phrase to define" />
+    <button
+      hx-post="/phrases"
+      hx-include="#new_phrase"
+      hx-target="#phrase_table"
+      hx-select="#phrase_table">save</button>
+  </form>
 {% include 'phrase_table.html' %}
 {% endblock %}

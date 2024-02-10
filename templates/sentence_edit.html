@@ -1,0 +1,18 @@
+<form hx-on::after-request="this.reset()">
+  <div class="sentence_text">
+      <input type="hidden" name="sentence" value="{{ sentence.id }}" />
+      <input type="text-area" name="words" value="{{ sentence.words }}" />
+  </div>
+  <div class="sentence_edit_controls">
+    <button hx-put="/sentences/{{ sentence.id }}?analyze=yes"
+            hx-trigger="click, keydown[keyCode==13]"
+            hx-include="#sentence_banner"
+            hx-target="#all_content"
+            hx-select="#all_content"
+      >Save updated</button>
+    <a hx-get="/sentences/{{ sentence.id }}"
+        hx-target="#sentence_banner"
+        hx-select="#sentence_banner"
+      >cancel</a>
+  </div>
+</form>
