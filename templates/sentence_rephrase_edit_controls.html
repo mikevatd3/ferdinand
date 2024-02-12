@@ -1,0 +1,10 @@
+<button hx-put="/phrases/{{ phrase.id }}?rephrase=yes"
+        hx-trigger="click, keydown[keyCode==13]"
+        hx-include="#sentence_banner"
+        hx-target="#all_content"
+        hx-select="#all_content"
+      >Confirm rephrase for <b>{{ phrase.words }}</b></button>
+<a hx-get="/sentences/{{ sentence.id }}"
+    hx-target="#sentence_banner"
+    hx-select="#sentence_banner"
+  >cancel</a>

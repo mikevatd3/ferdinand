@@ -3,8 +3,122 @@
   {% include 'nav.html' %}
 {% endblock %}
 {% block content %}
+  <svg width="1200" height="400"></svg>
   <form action="/sentences?analyze=yes" method="post">
-    <input type="text" name="sentence" placeholder="Enter some text to begin analysis" />
+    <input type="text" name="words" placeholder="Enter a sentence to begin analyzing" />
   </form>
   <p><a href="/help">how to use this tool</a></p>
+  <script>
+    const endpoint = "{{ url_for(request.endpoint) }}graph/data"
+    console.log(endpoint);
+    
+    fetch(endpoint)
+        .then(response => response.json())
+        .then(data => {
+            drawGraph(data);
+        })
+        .catch(error => console.error("error fetching data:", error));
+
+    function drawGraph(data) {
+        const svg = d3.select("svg"),
+            width = +svg.attr("width"),
+            height = +svg.attr("height");
+        
+        const nodeIds = [];
+        for (let item = 0; item < data.nodes.length; item++) {
+            data.nodes[item].live = true;
+            nodeIds.push(data.nodes[item].id);
+        }
+        
+        const upperEdge = Math.max(...nodeIds);
+
+        for (let item = 0; item < data.edges.length; item++) {
+            if (!data.edges[item].target) {
+                let newId = upperEdge + item + 1;
+                data.nodes.push({
+                    id: newId,
+                    words: "",
+                    live: false,
+                })
+                data.edges[item].target = newId;
+            }
+        }
+        
+        // Simulation setup with forces
+        let simulation = d3.forceSimulation(data.nodes)
+            .force("link", d3.forceLink(data.edges).id(d => d.id))
+            .force("charge", d3.forceManyBody().strength(-1000))
+            .force("center", d3.forceCenter(width / 3, height / 2));
+
+        // Add lines for every link in the dataset
+        const link = svg.append("g")
+            .attr("class", "links")
+            .selectAll("line")
+            .data(data.edges)
+            .enter().append("line")
+            .attr("stroke", "#272f3f")
+            .attr("stroke-width", 2);
+
+        // Add circles for every node in the dataset
+        const node = svg.append("g")
+            .attr("class", "nodes")
+            .selectAll("circle")
+            .data(data.nodes)
+            .enter().append("circle")
+            .attr("r", 5)
+            .attr("color", (c) => c.words ? "white" : "#272f3f")
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended)
+            ).on("mouseover", (event, d) => console.log(d));
+
+        // Add labels to each node
+        const nodeLabels = svg.append("g")
+            .attr("class", "nodeLabels")
+            .selectAll("text")
+            .data(data.nodes)
+            .enter().append("text")
+            .attr("x", 8)
+            .attr("y", "0.31em")
+            .attr("font-size", "0.75rem")
+            .text(d => d.words);
+
+        // Define the drag behavior
+        function dragstarted(event) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            event.subject.fx = event.subject.x;
+            event.subject.fy = event.subject.y;
+        }
+
+        function dragged(event) {
+            event.subject.fx = event.x;
+            event.subject.fy = event.y;
+        }
+
+        function dragended(event) {
+            if (!event.active) simulation.alphaTarget(0);
+            event.subject.fx = null;
+            event.subject.fy = null;
+        }
+
+        // Update positions each tick
+        simulation.on("tick", () => {
+            link
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+
+            nodeLabels
+                .attr("x", d => d.x + 8)
+                .attr("y", d => d.y + 3);
+          });
+    }
+
+  </script>
 {% endblock %}

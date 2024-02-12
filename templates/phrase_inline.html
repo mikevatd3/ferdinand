@@ -1,18 +1,20 @@
 <tr {% if phrase.stale %}class="stale_def"{% endif %}>
-  <th>{{ phrase.words }}</th>
+  <th><a href="/phrases/{{ phrase.id }}" hx-boost="true">{{ phrase.words }}</a></th>
   {% if phrase.definition %}
-  <td><i>{{ phrase.definition }}</i></td>
+    <td>{{ phrase.definition }}</td>
   {% else %}
-  <td><i>Not yet defined</i></td>
+    <td><i>Not yet defined</i></td>
   {% endif %}
   {% if phrase.stale %}
   <td><b>STALE</b></td>
   {% else %}
-  <td class="status_{{ phrase.definition_status.lower() }}"><i>{{ phrase.definition_status }}</i></td>
+  <td class="status_{{ phrase.definition_status.lower() }}">{{ phrase.definition_status }}</td>
   {% endif %}
-  <td><a 
-      hx-get="/phrases/{{ phrase.id }}?inline_edit=yes"
-      hx-target="closest tr"
-      hx-swap="outerHTML">edit</a> | <a hx-delete="/phrases/{{ phrase.id }}" hx-target="closest tr">delete</a>
+  <td>{% if phrase.stale %}<a 
+     hx-get="/phrases/{{ phrase.id }}?rephrase=yes"
+     hx-target=".sentence_edit_controls">rephrase</a>{% else %}<a 
+     hx-get="/phrases/{{ phrase.id }}?inline_edit=yes"
+     hx-target="closest tr"
+     hx-swap="outerHTML">edit</a>{% endif %} | <a hx-delete="/phrases/{{ phrase.id }}" hx-target="closest tr">delete</a>
   </td>
 </tr>

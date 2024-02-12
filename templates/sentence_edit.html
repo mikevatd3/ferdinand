@@ -1,7 +1,7 @@
 <form hx-on::after-request="this.reset()">
   <div class="sentence_text">
       <input type="hidden" name="sentence" value="{{ sentence.id }}" />
-      <input type="text-area" name="words" value="{{ sentence.words }}" />
+      <textarea name="words" rows=3 />{{ sentence.words }}</textarea>
   </div>
   <div class="sentence_edit_controls">
     <button hx-put="/sentences/{{ sentence.id }}?analyze=yes"

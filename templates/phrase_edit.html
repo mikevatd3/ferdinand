@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block nav %}
+{% with sentences=False,  phrases=True%}
+  {% include 'nav.html' %}
+{% endwith %}
+{% endblock %}
+{% block content %}
+<h1 class="phrase_title">{{ phrase.words }}</h1>
+    {% if phrase.definition %}<a href="/sentences/{{ phrase.def_stack_id }}">{{ phrase.definition }}</a>{% else %}<i>Not currently defined</i>{% endif %}
+<article id="phrase_notes">
+  <header class="notes_header">
+      <select name="status">
+        <option class="status_new" value="NEW" {% if phrase.definition_status == 'NEW' %}selected{% endif %}>NEW</option>
+        <option class="status_exploring" value="EXPLORING" {% if phrase.definition_status == 'EXPLORING' %}selected{% endif %}>EXPLORING</option>
+        <option class="status_accepted" value="ACCEPTED" {% if phrase.definition_status == 'ACCEPTED' %}selected{% endif %}>ACCEPTED</option>
+        <option class="status_stuck" value="STUCK" {% if phrase.definition_status == 'STUCK' %}selected{% endif %}>STUCK</option>
+      </select>
+      <div class="notes_edit">
+        <button 
+          hx-put="/phrases/{{ phrase.id }}"
+          hx-include="#phrase_notes"
+          hx-target="#phrase_notes"
+          hx-select="#phrase_notes"
+          hx-swap="outerHTML"
+          >&#x1F4BE; finish editing</button>
+      </div>
+    </header>
+  <textarea name="notes" rows=15>{{ phrase.notes }}</textarea>
+</article>
+{% endblock %}

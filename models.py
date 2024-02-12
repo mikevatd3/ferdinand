@@ -30,7 +30,11 @@ class Sentence:
         self.q_for_latest = (
             Query.with_(sub_q, "top_sentence")
             .from_(Tables.stacks)
-            .select(Tables.stacks.id, AliasedQuery("top_sentence").words)
+            .select(
+                Tables.stacks.id,
+                Tables.stacks.stale,
+                AliasedQuery("top_sentence").words,
+            )
             .join(AliasedQuery("top_sentence"))
             .on(AliasedQuery("top_sentence").stack_id == Tables.stacks.id)
         )
@@ -73,6 +77,30 @@ class Sentence:
         result = db.execute(text(str(stmt)), {"stack_id": stack_id})
         return result.fetchall()
 
+    def goes_stale(self, stack_id, db: Connection):
+        stmt = (
+            Query.update(Tables.stacks)
+            .set(Tables.stacks.stale, True)
+            .where(Tables.stacks.id == stack_id)
+        )
+
+        result = db.execute(text(str(stmt)))
+        db.commit()
+
+        return result.lastrowid
+
+    def refresh(self, stack_id, db: Connection):
+        stmt = (
+            Query.update(Tables.stacks)
+            .set(Tables.stacks.stale, False)
+            .where(Tables.stacks.id == stack_id)
+        )
+
+        result = db.execute(text(str(stmt)))
+        db.commit()
+
+        return result.lastrowid
+
     def update(self, stack_id, words, db: Connection):
         stmt = (
             Query.into(Tables.sentences)
@@ -87,9 +115,11 @@ class Sentence:
 
         phrases = Phrase().get_for_sentence(stack_id, db)
         stale_ids = tuple(
-            phrase.id for phrase in phrases if phrase.words not in words
+            phrase.id for phrase in phrases if phrase.words not in words.lower()
         )
 
+        stmt = Query.update(Tables.phrases).set(Tables.phrases.stale, False)
+        db.execute(text(str(stmt)))
         stmt = (
             Query.update(Tables.phrases)
             .set(Tables.phrases.stale, True)
@@ -102,6 +132,7 @@ class Sentence:
 
     def delete(self, stack_id, db: Connection):
         """Deletes the whole stack"""
+        db.execute(text("PRAGMA foreign_keys = ON;"))
         stmt = (
             Query.from_(Tables.stacks)
             .delete()
@@ -126,6 +157,7 @@ class Phrase:
             .groupby("stack_id")
             .having(fn.Max(Tables.sentences.id))
         )
+
         self.q_for_latest = (
             Query.with_(sub_q, "top_sentence")
             .from_(Tables.stacks)
@@ -142,7 +174,8 @@ class Phrase:
                 Tables.phrases.words,
                 Tables.phrases.stack_id,
                 Tables.phrases.stale,
-                AliasedQuery("latest_sentences").id.as_("stack_id"),
+                Tables.notes.words.as_("notes"),
+                AliasedQuery("latest_sentences").id.as_("def_stack_id"),
                 AliasedQuery("latest_sentences").words.as_("definition"),
                 Tables.notes.definition_status,
             )
@@ -186,12 +219,10 @@ class Phrase:
 
         return phrase_id
 
-    def get(self, phrase_id, db: Connection, include_notes=False):
+    def get(self, phrase_id, db: Connection):
         stmt = self.base_query.where(
             Tables.phrases.id == Parameter(":phrase_id")
         )
-        if include_notes:
-            stmt = stmt.select(Tables.notes.words)
 
         result = db.execute(text(str(stmt)), {"phrase_id": phrase_id})
         return result.fetchone()
@@ -230,7 +261,7 @@ class Phrase:
             )
             db.commit()
         else:
-            stack_id = Sentence().update(phrase.stack_id, new_words, db)
+            stack_id = Sentence().update(phrase.def_stack_id, new_words, db)
             db.commit()
 
         return phrase_id
@@ -262,10 +293,14 @@ class Phrase:
         )
         db.commit()
 
-        return result.fetchall()
+        return result.lastrowid
 
     def delete(self, phrase_id, db: Connection):
         """Deletes the whole phrase"""
+        db.execute(text("PRAGMA foreign_keys = ON;"))
+        phrase = self.get(phrase_id, db)
+        Sentence().goes_stale(phrase.def_stack_id, db)
+
         stmt = (
             Query.from_(Tables.phrases)
             .delete()
@@ -276,3 +311,66 @@ class Phrase:
         db.commit()
 
         return result.lastrowid
+
+    def rephrase(self, phrase_id, words, db: Connection):
+        stmt = (
+            Query.update(Tables.phrases)
+            .set(Tables.phrases.words, Parameter(":words"))
+            .set(Tables.phrases.stale, False)
+            .where(Tables.phrases.id == Parameter(":phrase_id"))
+        )
+
+        result = db.execute(
+            text(str(stmt)), {"words": words, "phrase_id": phrase_id}
+        )
+        db.commit()
+
+        return result.lastrowid
+
+
+class Graph:
+    """
+    The graph view builds a graph of the phrase-sentence relationships
+    along
+
+    Research: sqlite graph database
+    """
+
+    edges_stmt = (
+        Query.select(
+            Tables.phrases.id,
+            Tables.phrases.words,
+            Tables.phrases.stack_id,
+            Tables.phrases.stale,
+            Tables.definitions.stack_id.as_("def_stack_id"),
+        )
+        .from_(Tables.phrases)
+        .left_join(Tables.definitions)
+        .on(Tables.phrases.id == Tables.definitions.phrase_id)
+    )
+
+    @classmethod
+    def assemble_graph(cls, db):
+        nodes = Sentence().all(db)
+        edges = db.execute(text(str(cls.edges_stmt)))
+
+        return {
+            "nodes": [
+                {
+                    "id": node.id,
+                    "words": node.words,
+                }
+                for node in nodes
+            ],
+            "edges": [
+                {
+                    "id": edge.words,
+                    "source": edge.stack_id,
+                    "target": edge.def_stack_id,
+                    "stale": edge.stale,
+                }
+                for edge in edges
+            ],
+        }
+
+

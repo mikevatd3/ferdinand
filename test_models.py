@@ -32,10 +32,11 @@ def teardown_module():
 def db():
     test_db = f"test_{datetime.datetime.now().strftime('%Y%m%d')}"
     db = create_engine(f"sqlite:///projects/{test_db}.sqlite3")
-    
+
     con = db.connect()
     yield con
     con.close()
+
 
 # [x] Sentence Interface
 # [x] Create  --  Create new sentence (on a new stack)
@@ -132,6 +133,7 @@ def test_get_phrase(db):
     assert phrase.definition == None
     assert phrase.definition_status == "NEW"
 
+
 def test_get_for_sentence(db):
     words = "This is the eighth sentence."
     clip = "the eighth"
@@ -154,13 +156,12 @@ def test_revise_phrase_definition(db):
 
     stack_id = Sentence().new(words, db)
     phrase_id = Phrase().new(stack_id, clip, db)
-    
+
     definition = "The eighth is whatever comes after the seventh."
     Phrase().revise_definition(phrase_id, definition, db)
     phrase = Phrase().get(phrase_id, db)
 
     assert phrase.definition == definition
-
 
 
 def test_set_status(db):
@@ -169,12 +170,13 @@ def test_set_status(db):
 
     stack_id = Sentence().new(words, db)
     phrase_id = Phrase().new(stack_id, clip, db)
-    
+
     definition = "Nine isn't the best number but isn't the worst really."
     Phrase().revise_definition(phrase_id, definition, db)
     phrase = Phrase().get(phrase_id, db)
 
     assert phrase.definition == definition
+
 
 def test_stale_def(db):
     words = "This is the best sentence."
@@ -182,7 +184,7 @@ def test_stale_def(db):
 
     stack_id = Sentence().new(words, db)
     phrase_id = Phrase().new(stack_id, clip, db)
-    
+
     Sentence().update(stack_id, "This is the best pizza.", db)
     phrase = Phrase().get(phrase_id, db)
 
@@ -198,7 +200,7 @@ def test_delete_phrase(db):
     phrase_id = Phrase().new(stack_id, clip, db)
 
     Phrase().delete(phrase_id, db)
-    
+
     assert Phrase().get(phrase_id, db) == None
 
 
@@ -213,3 +215,49 @@ def test_update_status(db):
     phrase = Phrase().get(phrase_id, db)
 
     assert phrase.definition_status == "ACCEPTED"
+
+
+def test_rephrase_phrase(db):
+    words = "This is the best sentence."
+    clip = "best sentence"
+
+    stack_id = Sentence().new(words, db)
+    phrase_id = Phrase().new(stack_id, clip, db)
+
+    Sentence().update(stack_id, "This is worst sentence", db)
+
+    phrase = Phrase().get(phrase_id, db)
+    assert phrase.stale == True
+
+    next_id = Phrase().rephrase(phrase_id, "worst sentence", db)
+    phrase = Phrase().get(phrase_id, db)
+
+    assert phrase.words == "worst sentence"
+    assert not phrase.stale
+
+
+def test_stale_sentence(db):
+    clip = "best sentence"
+
+    phrase_id = Phrase().new(None, clip, db)
+    Phrase().revise_definition(
+        phrase_id, "It's the sentence that you wish you could write", db
+    )
+    phrase = Phrase().get(phrase_id, db)
+
+    sentence = Sentence().get(phrase.def_stack_id, db)
+    assert not sentence.stale
+    Phrase().delete(phrase_id, db)
+
+    sentence = Sentence().get(phrase.def_stack_id, db)
+    assert sentence.stale
+
+
+def test_update_notes(db):
+    phrase_id = Phrase().new(None, "a first try", db)
+    
+    test_notes = "Here is a set of notes to save"
+    Phrase().revise_notes(phrase_id, test_notes, db)
+    phrase = Phrase().get(phrase_id, db, include_notes=True)
+
+    assert phrase.notes == test_notes

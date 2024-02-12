@@ -24,13 +24,7 @@
     </thead>
     <tbody>
       {% for sentence in sentences %}
-        <tr>
-          <td>{{ sentence.words }}</td> 
-          <td><a href="/sentences/{{ sentence.id }}">analyze</a> | <a 
-              hx-delete="/sentences/{{ sentence.id }}"
-              hx-target="closest tr"
-              >delete</a></td>
-        </tr>
+        {% include 'sentence_inline.html' %}
       {% endfor %}
     </tbody>
   </table>

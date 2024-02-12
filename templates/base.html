@@ -9,6 +9,8 @@
   <script src="https://unpkg.com/htmx.org@1.9.10" 
     integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" 
     crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark-reasonable.min.css">
+  <script src="https://d3js.org/d3.v7.min.js"></script> <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <style>
     .status_new {
       color: deepskyblue;
@@ -31,11 +33,11 @@
       gap: 1rem;
       justify-content: flex-start;
       align-items: center;
-      background-color: #101020;
+      background-color: var(--pico-background-color);
       padding-left: 1rem;
     }
     .base_nav * {
-      padding: 0.7rem;
+      padding: 1.2rem;
       font-size: x-large;
     }
     .base_nav .nav_selected {
@@ -47,10 +49,17 @@
       font-weight: bold;
     }
     .base_nav .home {
-      color: white;
+      color: var(--pico-color);
       font-weight: bold;
       font-size: xx-large;
     }
+
+    .current_project {
+      padding: 0 1em 0 1em;
+      margin: 0 0 0 auto;
+      align-items: center;
+    }
+
     .phrase-check {
       display: none;
     }
@@ -104,18 +113,58 @@
     .sentence_edit_controls a {
       margin-bottom: 1rem;
     }
+    
+    textarea {
+      resize: vertical;
+    }
 
-    .sentence_text input[type="text-area"] {
+    .sentence_text textarea {
       font-size: xx-large;
       font-weight: bold;
     }
 
-    .stale_def {
-      color: gray;
-      background-color: gainsboro;
-      font-style: italic;
+    @media (prefers-color-scheme: light) {
+      .stale_def {
+        background-color: gainsboro;
+        font-style: italic;
+      }
     }
 
+    @media (prefers-color-scheme: dark) {
+      .stale_def {
+        background-color: #272f3f;
+        font-style: italic;
+      }
+    }
+
+    .phrase_title {
+      margin-bottom: 1rem;
+    }
+    
+    .phrase_notes {
+      margin-top: 0;
+    }
+
+    #phrase_notes textarea {
+      font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+    }
+    .notes_header {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .notes_body {
+      min-height: 15rem;
+      border-radius: 0.25rem;
+    }
+
+    .notes_edit {
+      margin-left: auto;
+      justify-content: flex-end;
+    }
+    
   </style>
 </head>
 

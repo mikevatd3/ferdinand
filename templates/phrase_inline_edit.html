@@ -5,7 +5,6 @@
     {% if not phrase.definition %}
     <input type="text" name="definition" placeholder="enter a new definition" />
     {% else %}
-    <input type="hidden" name="thread" value="{{ phrase.stack_id }}" />
     <input type="text" name="definition" value="{{ phrase.definition }}" />
     {% endif %}
   </td>

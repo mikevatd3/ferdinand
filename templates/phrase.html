@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block nav %}
+{% with sentences=False,  phrases=True%}
+  {% include 'nav.html' %}
+{% endwith %}
+{% endblock %}
+{% block content %}
+<h1 class="phrase_title">{{ phrase.words }}</h1>
+<div>
+{% if phrase.definition %}<a href="/sentences/{{ phrase.def_stack_id }}">{{ phrase.definition }}</a>{% else %}<i>Not currently defined</i>{% endif %}
+</div>
+<article id="phrase_notes">
+  <header class="notes_header">
+    <p class="status_{{ phrase.definition_status.lower() }}"
+      >{{ phrase.definition_status }}</p>
+    <div class="notes_edit">
+      <a href="/phrases/{{ phrase.id }}?edit=yes">&#x270E; edit notes</a>
+    </div>
+  </header>
+  <div class="notes_body">{{ notes|safe }}</div>
+  <script>hljs.highlightAll();</script>
+</article>
+{% endblock %}

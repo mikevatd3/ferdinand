@@ -1,0 +1,11 @@
+<tr {% if sentence.stale %}class="stale_def"{% endif %}>
+  <td>{% if sentence.stale %}<b>STALE:</b> {% endif %}{{ sentence.words }}</td>
+    <td>{% if sentence.stale %}<a 
+          hx-put="/sentences/{{ sentence.id }}?refresh=yes"
+          hx-target="closest tr"
+          hx-swap="outerHTML"
+        >refresh</a>{% else %}<a href="/sentences/{{ sentence.id }}">analyze</a>{% endif %} | <a 
+        hx-delete="/sentences/{{ sentence.id }}"
+        hx-target="closest tr"
+        >delete</a></td>
+</tr>
