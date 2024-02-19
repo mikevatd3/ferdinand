@@ -1,0 +1,6 @@
+<div class"phrase_definition">
+  {% if phrase.definition %}<a href="/sentences/{{ phrase.def_stack_id }}"
+    >{{ phrase.definition }}</a>{% else %}<i><a hx-get="/sentences?inline_add_for={{ phrase.id }}"
+                                                hx-swap="outerHTML"
+                                                >Add definition</a></i>{% endif %}
+</div>

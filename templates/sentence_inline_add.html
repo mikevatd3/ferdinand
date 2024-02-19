@@ -1,0 +1,6 @@
+<input type="hidden" name="phrase_id" value="{{ phrase_id }}">
+<input type="text" name="definition" placeholder="enter a new definition" />
+<td><button hx-post="/definitions?inline_add=yes"
+       hx-target="closest div"
+       hx-include="closest div"
+       hx-swap="outerHTML">save</button></td>

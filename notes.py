@@ -25,22 +25,3 @@ def clean_and_render_markup(markup: str):
             }
         },
     )
-
-
-if __name__ == "__main__":
-
-    html = """
-# Here is a html thing
-
-## Here is an h2
-
-Here is some paragraph text as you'd expect.
-
-```sql
-select * from blah
-where blah.num > 5
-orderby blah.timestamp;
-```
-"""
-
-    print(clean_and_render_markup(html))

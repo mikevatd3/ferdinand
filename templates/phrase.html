@@ -6,9 +6,7 @@
 {% endblock %}
 {% block content %}
 <h1 class="phrase_title">{{ phrase.words }}</h1>
-<div>
-{% if phrase.definition %}<a href="/sentences/{{ phrase.def_stack_id }}">{{ phrase.definition }}</a>{% else %}<i>Not currently defined</i>{% endif %}
-</div>
+  {% include 'sentence_simple.html' %}
 <article id="phrase_notes">
   <header class="notes_header">
     <p class="status_{{ phrase.definition_status.lower() }}"

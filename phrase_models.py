@@ -14,6 +14,8 @@ class Tables:
     phrases = Table("phrases")
     definitions = Table("definitions")
     notes = Table("notes")
+    comments = Table("comments")
+    users = Table("users")
 
 
 class Sentence:
@@ -328,6 +330,12 @@ class Phrase:
         return result.lastrowid
 
 
+def stamp_id(node_type: str, id: int | None):
+    if id is None:
+        return None
+    return f"{node_type}{id}"
+
+
 class Graph:
     """
     The graph view builds a graph of the phrase-sentence relationships
@@ -335,41 +343,62 @@ class Graph:
 
     Research: sqlite graph database
     """
-
+    
     edges_stmt = (
         Query.select(
-            Tables.phrases.id,
-            Tables.phrases.words,
-            Tables.phrases.stack_id,
-            Tables.phrases.stale,
-            Tables.definitions.stack_id.as_("def_stack_id"),
-        )
-        .from_(Tables.phrases)
-        .left_join(Tables.definitions)
+            Tables.definitions.phrase_id,
+            Tables.definitions.stack_id,
+        ).from_(Tables.definitions)
+        .join(Tables.phrases)
         .on(Tables.phrases.id == Tables.definitions.phrase_id)
+        .join(Tables.stacks)
+        .on(Tables.stacks.id == Tables.definitions.stack_id)
     )
-
+    
     @classmethod
     def assemble_graph(cls, db):
-        nodes = Sentence().all(db)
+        sentences = Sentence().all(db)
+        phrases = Phrase().all(db)
         edges = db.execute(text(str(cls.edges_stmt)))
 
         return {
             "nodes": [
-                {
-                    "id": node.id,
-                    "words": node.words,
-                }
-                for node in nodes
+                *[
+                    {
+                    "id": f"s{sentence.id}",
+                    "words": sentence.words,
+                    "type": "sentence",
+                    }
+                    for sentence in sentences
+                ],
+                *[
+                    {
+                        "id": f"p{phrase.id}",
+                        "words": phrase.words,
+                        "stale": phrase.stale,
+                        "type": "phrase",
+                    } for phrase in phrases
+                ],
             ],
             "edges": [
-                {
-                    "id": edge.words,
-                    "source": edge.stack_id,
-                    "target": edge.def_stack_id,
-                    "stale": edge.stale,
-                }
-                for edge in edges
+                *[
+                    {
+                        "id": stamp_id("e", id),
+                        "source": stamp_id("s", phrase.stack_id),
+                        "target": stamp_id("p", phrase.id),
+                    }
+                    for id, phrase in enumerate(phrases)
+                    if (phrase.stack_id and phrase.id)
+                ],
+                *[
+                    {
+                        "id": stamp_id("e", id),
+                        "source": stamp_id("p", edge.phrase_id),
+                        "target": stamp_id("s", edge.stack_id),
+                    }
+                    for id, edge in enumerate(edges, len(phrases))
+                    if (edge.stack_id and edge.phrase_id)
+                ],
             ],
         }
 

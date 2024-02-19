@@ -13,7 +13,7 @@ from flask import (
 from sqlalchemy import create_engine
 
 from notes import clean_and_render_markup
-from models import Phrase, Sentence, Graph
+from phrase_models import Phrase, Sentence, Graph
 
 app = Flask(__name__)
 
@@ -31,6 +31,9 @@ def index():
 
 @app.route("/sentences", methods=["GET", "POST"])
 def sentences():
+    if (phrase_id := request.args.get("inline_add_for")):
+        return render_template("sentence_inline_add.html", phrase_id=phrase_id)
+
     with engine.connect() as db:
         if request.method == "POST":
             words = request.form.get("words")
@@ -231,6 +234,13 @@ def definitions():
             if status != "NEW":
                 Phrase().set_status(phrase_id, status, db)
 
+            if request.args.get("inline_add") == "yes":
+                phrase = Phrase().get(phrase_id, db)
+                return render_template(
+                    "sentence_simple.html",
+                    phrase=phrase,
+                )
+
             return redirect(f"/phrases/{phrase_id}?inline=yes")
 
     return abort(404)
@@ -239,14 +249,6 @@ def definitions():
 @app.route("/help")
 def help():
     return render_template("help.html", current_project=project_name)
-
-
-@app.route("/graph")
-def graph():
-
-    return render_template(
-        "graph.html", graph=graph, current_project=project_name
-    )
 
 
 @app.route("/graph/data")
