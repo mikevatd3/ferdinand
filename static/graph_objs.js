@@ -1,10 +1,18 @@
-const SELECTED_COLOR = "#edce32";
-const PARENT_COLOR = "#7185eb";
-const CHILD_COLOR = "#61c079";
-const PHRASE_COLOR = "lightcoral";
-const SENTENCE_COLOR = "#35b5c0";
 
-const shortenSentence = (text) => text.length > 25 ? text.slice(0, 22) + "..." : text;
+function shortenSentence(text) {
+    if (text.length > 25) {
+        return text.slice(0, 22) + "..."
+    }
+    return text
+}
+
+function wordWrap(text) {
+    if (text.length > 25) {
+        return text.slice(0, 22) + "..."
+    }
+    return text
+}
+
 
 class Label {
     constructor(id, words) {
@@ -16,13 +24,16 @@ class Label {
             case "mouseover":
                 d3.select(`#${this.id}`)
                   .text(this.words)
-                  .style("font-size", "larger")
+                  .style("font-size", "none")
+                  .style("opacity", 1)
                   .attr("display", "inline")
                 break;
 
             case "indirectOver":
                 d3.select(`#${this.id}`)
                   .text(shortenSentence(this.words))
+                  .style("opacity", 0.5)
+                  .style("font-size", "smaller")
                   .attr("display", "inline")
                 break;
 
@@ -50,9 +61,10 @@ class Sentence {
             case "mouseover":
                 // First message the event out to linked objects
                 this.label.handle("mouseover");
-                if (this.parent) {this.parent.handle("parentOver")};
-                this.children.forEach(child => child.handle("childOver"));
+                this.children.forEach(child =>  child.handle("childOver"));
                 this.childLinks.forEach(child =>  child.handle("childLinkOver"));
+                if (this.parent) {this.parent.handle("parentOver")};
+                if (this.parent) {this.parentLink.handle("parentLinkOver")};
 
                 // Then handle the d3 stuff on the object itself
                 d3.select(`#${this.id}`)
@@ -61,14 +73,10 @@ class Sentence {
 
             case "parentOver":
                 this.label.handle("indirectOver");
-                d3.select(`#${this.id}`)
-                  .attr("class", "parent_node")
                 break;
 
             case "childOver":
                 this.label.handle("indirectOver");
-                d3.select(`#${this.id}`)
-                  .attr("class", "child_node")
                 break;
 
             case "relatedOver":
@@ -77,6 +85,8 @@ class Sentence {
             case "mouseout":
                 if (this.parent) {this.parent.handle("parentOut")};
                 this.children.forEach(child => child.handle("childOut"));
+                this.childLinks.forEach(child =>  child.handle("childLinkOut"));
+                if (this.parentLink) {this.parentLink.handle("parentLinkOut")};
                 // don't break!
 
             default:
@@ -104,7 +114,11 @@ class Phrase {
             case "mouseover":
                 this.label.handle("mouseover");
                 if (this.context) {this.context.handle("parentOver")};
+                if (this.contextLink) {this.contextLink.handle("parentLinkOver")};
                 if (this.definition) {this.definition.handle("childOver")};
+                if (this.definitionLink) {
+                    this.definitionLink.handle("childLinkOver")
+                };
 
                 d3.select(`#${this.id}`)
                   .attr("class", "selected_node")
@@ -112,14 +126,10 @@ class Phrase {
 
             case "parentOver":
                 this.label.handle("indirectOver")
-                d3.select(`#${this.id}`)
-                  .attr("class", "parent_node")
                 break;
 
             case "childOver":
                 this.label.handle("indirectOver")
-                d3.select(`#${this.id}`)
-                  .attr("class", "child_node")
                 break;
 
             case "relatedOver":
@@ -127,8 +137,10 @@ class Phrase {
 
             default:
                 this.label.handle("mouseout")
+                if (this.contextLink) {this.contextLink.handle("parentLinkOut")};
                 if (this.context) {this.context.handle("parentOut")};
                 if (this.definition) {this.definition.handle("childOut")};
+                if (this.definitionLink) {this.definitionLink.handle("childLinkOut")};
 
                 d3.select(`#${this.id}`)
                   .attr("class", "phrase_node")
@@ -159,27 +171,39 @@ class Link {
     }
     handle(message) {
         switch (message) {
-            default:
-                console.log(this.id);
+            case "childLinkOver":
                 d3.select(`#${this.id}`)
-                  .attr("stroke", "blue")
-                  .attr("stroke-width", 3)
+                  .attr("stroke", "#61c079")
+                  .attr("stroke-width", 4)
+                break;
+
+            case "parentLinkOver":
+                d3.select(`#${this.id}`)
+                  .attr("stroke", "#7185eb")
+                  .attr("stroke-width", 4)
+                break;
+
+            default:
+                d3.select(`#${this.id}`)
+                  .attr("stroke", "#272f3f")
+                  .attr("stroke-width", 2)
         }
     }
 }
 
 function buildLink(edge) {
     return new Link(
-        `l-${edge.source}-${edge.target}`
+        `ln-${edge.source}-${edge.target}`
     );
 }
 
 function makeConnections(edge, comsNodes, comsLinks) {
     source = comsNodes[edge.source];
     target = comsNodes[edge.target];
-    link = comsLinks[`l-${edge.source}-${edge.target}`];
+    link = comsLinks[`ln-${edge.source}-${edge.target}`];
 
-    switch (source.constructor) { // 'constructor' is aparently how to get the name of user-defined objects
+    // 'constructor' is aparently how to get the name of user-defined objects
+    switch (source.constructor) { 
         case Sentence:
             // Sentence links
             source.children.push(target);
@@ -206,7 +230,9 @@ function buildComsSystem(graph) {
     let comsNodes = {};
     let comsLinks = {};
     graph.nodes.forEach((node) => comsNodes[node.id] = buildNode(node));
-    graph.edges.forEach((edge) => comsLinks[`l-${edge.source}-${edge.target}`] = buildLink(edge));
+    graph.edges.forEach((edge) => {
+        comsLinks[`ln-${edge.source}-${edge.target}`] = buildLink(edge)
+    });
     graph.edges.forEach((edge) => makeConnections(edge, comsNodes, comsLinks));
     
     return comsNodes;

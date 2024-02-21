@@ -6,7 +6,6 @@ fetch(endpoint)
     })
     .catch(error => console.error("error fetching data:", error));
 
-const defaultColor = (node) => node.type === "phrase" ? PHRASE_COLOR : SENTENCE_COLOR;
 const addClassName = (node) => node.type === "phrase" ? "phrase_node" : "sentence_node";
 
 function buildUrl(node) {
@@ -38,7 +37,7 @@ function drawGraph(graph, coms) {
         .selectAll("line")
         .data(graph.edges)
         .enter().append("line")
-        .attr("id", (d) => `l-${d.source.id}-${d.target.id}`)
+        .attr("id", (d) => `ln-${d.source.id}-${d.target.id}`)
         .attr("stroke", "#272f3f")
         .attr("stroke-width", 2);
     
@@ -53,7 +52,6 @@ function drawGraph(graph, coms) {
         .append("circle")
         .attr("id", (d) => d.id)
         .attr("r", 8)
-        .attr("color", defaultColor)
         .attr("class", addClassName)
         .call(d3.drag()
             .on("start", dragstarted)
